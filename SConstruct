@@ -13,7 +13,7 @@ env.ParseConfig('sdl-config --cflags')
 env.ParseConfig('sdl-config --libs')
 
 # gather a list of source files
-target_sources = ['hw.c']#Glob('*.c')
+target_sources = ['simulator.c']#Glob('*.c')
 lib_sources = Glob('lib/*.c')
 
 # add additional compiler flags
