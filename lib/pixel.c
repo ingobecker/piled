@@ -98,3 +98,22 @@ void pixels_free(linked_list_t *pixels){
     free(p);
   }
 }
+
+struct sim_pixel *pixel_get_clicked(linked_list_t *pixels){
+
+  int x, y;
+  uint8_t buttons;
+
+  buttons = SDL_GetMouseState(&x, &y);
+  if(buttons & SDL_BUTTON(SDL_BUTTON_LEFT)){
+    while(pixels){
+      struct sim_pixel *pixel = pixels->val;
+      if((x > pixel->rect.x) && (x < (pixel->rect.x + pixel->rect.w)))
+        if((y > pixel->rect.y) && (y < (pixel->rect.y + pixel->rect.h))){
+          return pixel;
+        }
+      pixels = pixels->next;
+    }
+  }
+    return NULL;
+}
