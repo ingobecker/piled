@@ -1,0 +1,8 @@
+build/
+simulator
+*.elf
+*.cmd
+*.hex
+*.o
+*.swp
+*.pyc
