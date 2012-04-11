@@ -1,0 +1,1 @@
+#define ANIMATION_DIM_UP_STATE    0

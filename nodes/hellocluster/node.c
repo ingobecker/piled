@@ -1,12 +1,20 @@
-/*
-void data_rx(struct fifo rx_buffer){
-  uint8_t address = fifo_get(&rx_buffer);
-  uint8_t animation = fifo_get(&rx_buffer);
+#include <stdint.h>
+#include <stdio.h>
+#include "linked_list.h"
+#include "fifo.h"
+#include "node.h"
+#include "animations.h"
 
-  node.animation_next =  0;
+void data_rx(node_t *node){
+
+  uint8_t address = fifo_get(&node->data_rx_buffer);
+  uint8_t animation = fifo_get(&node->data_rx_buffer);
+
+  node->animation_next =  0;
 }
 
-void sensor_handler(uint8_t data){
-  data_tx(1);
+void sensor_handler(node_t *node, uint8_t data){
+  node->animation_next = ANIMATION_DIM_UP_STATE;
+  node->animation_reg = (1<<ANIFF);
+  puts("sensi senso");
 }
-*/

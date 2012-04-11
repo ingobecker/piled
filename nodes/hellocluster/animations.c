@@ -17,18 +17,29 @@ void animation_dim_up_state(node_t *node){
   uint8_t counter;
   animation_restore_state(2, &counter_offset, &counter);
 #else
+  static uint8_t counter_offset = 0;
   static uint8_t counter = 0;
 #endif
-  //printf("counter: %d\n", counter);
-  if(counter_offset > node->address)
-    if(counter < (0x60 - 2)){
+  puts("animation");
+
+  if(node->animation_reg & (1<<ANIFF)){
+    counter_offset = 0;
+    counter = 0;
+  }
+
+  if(counter_offset > node->address){
+    if(counter < (128)){
       int v = (counter++ & 31) * 10;
       fifo_put(&node->brightness_buffer, v);
+      puts("fifo write");
     }
-    else
+    else{
       node->animation_reg |= (1<<ANIEOF);
-   else
-     counter_offset++;
+      puts("animation end!");
+    }
+  }
+  else
+    counter_offset++;
 
 #ifdef _SIM_
   animation_save_state(2, counter_offset, counter);
