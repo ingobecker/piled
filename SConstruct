@@ -3,7 +3,8 @@ import glob
 # compile simulator using specific node code
 default_node =  'hellocluster'
 node = ARGUMENTS.get('node', default_node)
-node_sources = Glob('nodes/' + node + '/*.c')
+node_dir = 'nodes/' + node
+node_sources = Glob(node_dir + '/*.c')
 
 # create build environment
 env = Environment()
@@ -21,7 +22,7 @@ env.Append(CCFLAGS = ['-g', '-Wall'])
 # add additional libraries to link against
 env.Append(LIBS = ['SDL_image'])
 # add fifo header and lib
-env.AppendUnique(CPPPATH=['lib'])
+env.AppendUnique(CPPPATH=['lib', node_dir])
 
 # build target
 # output executable will be "game"
