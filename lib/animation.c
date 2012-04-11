@@ -14,14 +14,15 @@ linked_list_t **animation_current_state;
 
 void animation_render_frame(linked_list_t *pixels){
 
-  int cnt = 0;
   while(pixels){
     //printf("render frame from pixel %d\n", cnt++);
     struct sim_pixel *pixel = pixels->val;
     node_t *node = &pixel->node;
     if(!(node->animation_reg & (1<<ANIEOF))){
+      printf("render node id=%d\n", node->address);
       animation_current_state = &pixel->animation_state;
       animation_index[node->animation_next](node);
+      node->animation_reg &= ~(1<<ANIFF);
     }
     pixels = pixels->next;
   }

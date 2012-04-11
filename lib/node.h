@@ -22,6 +22,7 @@
 struct node{
   uint8_t address;
   uint8_t address_max;
+  uint8_t data_length;
   uint8_t animation_next;
   uint8_t animation_reg;
   struct fifo brightness_buffer;
@@ -51,7 +52,7 @@ extern void data_tx(uint8_t data);
 // sensors
 
 // handling sensor data
-extern void sensor_handler(uint8_t data);
+extern void sensor_handler(node_t *node, uint8_t data);
 
 
 // simulator

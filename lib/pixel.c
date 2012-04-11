@@ -31,7 +31,7 @@ void pixels_init(linked_list_t *pixels, SDL_Surface *screen){
   int col_index = 0;
 
   while(pixels){
-    printf("init pixel id: %d\n", id);
+    //printf("init pixel id: %d\n", id);
     struct sim_pixel *pixel = pixels->val;
 
     x_new = ((PIXEL_SPACE + PIXEL_SIZE) * col_index) + PIXEL_SPACE;
