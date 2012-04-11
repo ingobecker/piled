@@ -54,11 +54,26 @@ linked_list_t *pixels;
 
 uint16_t frame_cnt;
 
-
 void main_task(SDL_Surface *screen){
 
   animation_render_frame(pixels);
   animation_output_frame(screen, pixels);
+
+  struct sim_pixel *pixel = pixel_get_clicked(pixels);
+  if(pixel != NULL){
+    printf("click detected on pixel %d\n", pixel->node.address);
+    sensor_handler(&pixel->node, 1);
+  }
+
+/*
+  linked_list_t *p = pixels;
+  while(p){
+    struct sim_pixel *pixel = p->val;
+    if(pixel->node.data_rx_buffer.fill_size == pixel->node.data_length)
+      data_rx(&pixel->node.rx_buffer);
+    p = p->next;
+  }
+  */
 }
 
 void init_task(SDL_Surface *screen){
@@ -68,7 +83,7 @@ void init_task(SDL_Surface *screen){
   linked_list_t *p = pixels;
   while(p){
     struct sim_pixel *pixel = p->val;
-    pixel->node.animation_next = 1;
+    pixel->node.animation_next = 0;
     p = p->next;
   }
   frame_cnt = 0;
@@ -106,6 +121,7 @@ int main(int argc, char *argv[])
 
   while(!done){
 
+    SDL_Flip(screen);
     Uint32 start = SDL_GetTicks();
 
     while(SDL_PollEvent(&event)){
@@ -117,7 +133,6 @@ int main(int argc, char *argv[])
     }
 
     main_task(screen);
-    SDL_Flip(screen);
     frame_cnt++;
     if(frame_cnt == STOP_FRAME)
       done = 1;
