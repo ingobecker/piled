@@ -78,6 +78,38 @@ void pixels_init(linked_list_t *pixels, SDL_Surface *screen){
   }
 }
 
+void pixels_draw_border(linked_list_t *pixels, SDL_Surface *screen){
+  while(pixels){
+    struct sim_pixel *pixel = pixels->val;
+
+    SDL_Rect border_line;
+    border_line.w = PIXEL_BORDER;
+    border_line.h = PIXEL_SIZE;
+    border_line.y = pixel->rect.y;
+
+    // draw left border
+    border_line.x = pixel->rect.x - PIXEL_BORDER;
+    SDL_FillRect(screen, &border_line, SDL_MapRGB(screen->format, 0xff, 0xff, 0xff));
+
+    // draw right border
+    border_line.x = pixel->rect.x + PIXEL_SIZE;
+    SDL_FillRect(screen, &border_line, SDL_MapRGB(screen->format, 0xff, 0xff, 0xff));
+
+    // draw top border
+    border_line.h = PIXEL_BORDER;
+    border_line.w = PIXEL_SIZE + PIXEL_BORDER * 2;
+    border_line.x = pixel->rect.x - PIXEL_BORDER;
+    border_line.y = pixel->rect.y - PIXEL_BORDER;
+    SDL_FillRect(screen, &border_line, SDL_MapRGB(screen->format, 0xff, 0xff, 0xff));
+
+    // draw bottom border
+    border_line.y = pixel->rect.y + PIXEL_SIZE;
+    SDL_FillRect(screen, &border_line, SDL_MapRGB(screen->format, 0xff, 0xff, 0xff));
+
+    pixels = pixels->next;
+  }
+}
+
 void animation_state_free(linked_list_t *state){
   while(state){
     uint8_t *val = state->val;
