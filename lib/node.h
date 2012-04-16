@@ -1,22 +1,8 @@
-
+#ifndef __NODE__
+#define __NODE__
 /*
-
-  node driver backends
-
-    sim
-      - everything simulated in software
- 
-    hw-test
-      - communication: uart mpc
-      - sensor: switch
-
-    hw-rf
-      - communitcation: rfm12
-      - sensor: capaitive
-
-    hw-ir
-      - communication: ir
-      - sensor: capacitive
+  node_t:   represents the hardware specific state
+            of the node.
 */
 
 struct node{
@@ -32,32 +18,30 @@ struct node{
 
 typedef struct node node_t;
 
-// animation_reg bits
+/*
+  Animation Register:
+  | - | - | - | - | ANIFF | ANIOF |
 
-// animation finished
+  ANIFF:  Signals that the output-loop is
+          at the first frame.
+  ANIEOF: Signals the output-loop that the
+          animation reached it's last frame.
+*/
+
 #define ANIEOF        0
-// animation first frame requested
 #define ANIFF         1
 
+extern void node_data_tx(uint8_t data);
 
-// communication
+/*
+  The following functions have to be
+  implemented on an application specific manner.
 
-// handling received data
-extern void data_rx_handler(uint8_t data);
+  node_data_rx_handler(): This function is called every time
+                          the node receives an incomming data-frame.  node_sensor_handler():  This function is called every time
+                          the nodes sensor was triggered.
+*/
 
-// sending data
-extern void data_tx(uint8_t data);
-
-
-// sensors
-
-// handling sensor data
-extern void sensor_handler(node_t *node, uint8_t data);
-
-
-// simulator
-
-#ifdef _SIM_
-// setting up simulator configuration
-extern void setup(void);
+extern void node_data_rx_handler(node_t *node);
+extern void node_sensor_handler(node_t *node, uint8_t data);
 #endif

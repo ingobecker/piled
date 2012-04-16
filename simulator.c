@@ -3,12 +3,14 @@
 #include <stdlib.h>
 #include <SDL/SDL.h>
 #include <SDL/SDL_image.h>
+#include "config.h"
 #include "linked_list.h"
 #include "fifo.h"
 #include "node.h"
+#include "sim_node.h"
 #include "pixel.h"
 #include "animation.h"
-#include "config.h"
+#include "graphics.h"
 
 
 /*
@@ -50,20 +52,72 @@ Communication Layer
 
 */
 
-linked_list_t *pixels;
 
 uint16_t frame_cnt;
 
+void init_task(SDL_Surface *screen){
+
+  graphics_draw_background(screen);
+
+  sim_node_setup();
+  // alloc
+  sim_nodes_g = sim_nodes_alloc(PIXEL_COUNT);
+  pixels_g = pixels_alloc(PIXEL_COUNT);
+  //init
+  pixels_init(pixels_g, screen);
+  pixels_draw_border(pixels_g, screen);
+
+  frame_cnt = 0;
+}
+
 void main_task(SDL_Surface *screen){
 
-  animation_render_frame(pixels);
-  animation_output_frame(screen, pixels);
+  linked_list_t *sim_nodes = sim_nodes_g;
+  linked_list_t *pixels = pixels_g;
 
-  struct sim_pixel *pixel = pixel_get_clicked(pixels);
-  if(pixel != NULL){
-    printf("click detected on pixel %d\n", pixel->node.address);
-    sensor_handler(&pixel->node, 1);
+  while(sim_nodes){
+    sim_node_t *sim_node = sim_nodes->val;
+    pixel_t *pixel = pixels->val;
+
+    sim_node_load_context(sim_node->node_context);
+
+    // draw
+    animation_draw_pixel_frame(screen, &sim_node->node, pixel);
+
+    // render
+    animation_render_pixel_frame(&sim_node->node, pixel);
+
+    // sensor
+
+    sim_node_save_context(sim_node->node_context);
+    pixels = pixels->next;
+    sim_nodes = sim_nodes->next;
   }
+
+  /*
+  // data rx
+  linked_list_t *p = pixels_g;
+  while(p){
+    struct sim_pixel *pixel = p->val;
+    if(pixel->node.data_rx_buffer.fill_size > 0)
+      data_rx_handler(&pixel->node);
+    p = p->next;
+  }
+
+  // data tx
+  if(pixel != NULL){
+    if(pixel->node.data_tx_buffer.fill_size > 0){
+      puts("found data to transmit");
+      uint8_t data = fifo_get(&pixel->node.data_tx_buffer);
+      linked_list_t *p = pixels;
+      while(p){
+        struct sim_pixel *pixel_walk = p->val;
+        fifo_put(&pixel_walk->node.data_rx_buffer, data);
+        p = p->next;
+      }
+    }
+  }
+  */
 
 /*
   linked_list_t *p = pixels;
@@ -76,38 +130,6 @@ void main_task(SDL_Surface *screen){
   */
 }
 
-void init_task(SDL_Surface *screen){
-
-  pixels = pixels_alloc(PIXEL_COUNT);
-  pixels_init(pixels, screen);
-  linked_list_t *p = pixels;
-  while(p){
-    struct sim_pixel *pixel = p->val;
-    pixel->node.animation_next = 0;
-    p = p->next;
-  }
-  frame_cnt = 0;
-
-}
-
-SDL_Surface *sdl_init(){
-  
-  SDL_Surface *screen;
-  
-  if(SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER) == -1){
-    printf("Can't init SDL:  %s\n", SDL_GetError());
-    exit(1);
-  }
-
-  atexit(SDL_Quit); 
-  screen = SDL_SetVideoMode(640, 480, 16, SDL_HWSURFACE | SDL_DOUBLEBUF);
-  if(screen == NULL){
-    printf("Can't set video mode: %s\n", SDL_GetError());
-    exit(1);
-  }
-
-  return screen;
-}
 
 int main(int argc, char *argv[])
 {
@@ -117,7 +139,6 @@ int main(int argc, char *argv[])
 
   screen = sdl_init();
   init_task(screen);
-  //debug_task();
 
   while(!done){
 
@@ -141,7 +162,7 @@ int main(int argc, char *argv[])
       SDL_Delay((1000/FPS) - (SDL_GetTicks() - start));
     }
   }
-  pixels_free(pixels);
+  pixels_free(pixels_g);
   
   return 0;
 }

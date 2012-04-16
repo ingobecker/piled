@@ -5,23 +5,21 @@
 #include "linked_list.h"
 #include "fifo.h"
 #include "node.h"
+#include "pixel.h"
 #include "animation.h"
 
 // this animation dims up the led
 // but the animation begins after an offset
 // calculated by the address of this node
 
-void shift_pixel(node_t *node){
-#ifdef _SIM_
-  uint8_t counter_offset;
-  uint8_t counter;
-  animation_restore_state(2, &counter_offset, &counter);
-#else
-  static uint8_t counter_offset = 0;
-  static uint8_t counter = 0;
-#endif
+uint8_t counter_offset = 0;
+uint8_t counter = 0;
 
-  //puts("animation");
+void sim_node_setup(){
+  sim_node_define_context(2, &counter, &counter_offset);
+}
+
+void shift_pixel(node_t *node){
 
   if(node->animation_reg & (1<<ANIFF)){
     counter_offset = 0;
@@ -42,12 +40,9 @@ void shift_pixel(node_t *node){
   }
   else
     counter_offset++;
-
-#ifdef _SIM_
-  animation_save_state(2, counter_offset, counter);
-#endif
 }
 
+/*
 void shift_fade_pixel(node_t *node){
 #ifdef _SIM_
   uint8_t counter_offset;
@@ -98,7 +93,8 @@ void shift_fade_pixel(node_t *node){
   animation_save_state(3, counter_offset, counter, down);
 #endif
 }
+*/
 
 animation_t animation_index[] = { 
  shift_pixel 
-  };
+};
