@@ -16,6 +16,7 @@ struct fifo{
   uint8_t w_index;
 };
 
-uint8_t fifo_get(struct fifo *f);
-void fifo_put(struct fifo *f, uint8_t v);
+extern void fifo_init(struct fifo *f);
+extern uint8_t fifo_get(struct fifo *f);
+extern void fifo_put(struct fifo *f, uint8_t v);
 #endif
