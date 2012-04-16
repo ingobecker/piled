@@ -23,6 +23,9 @@ env.Append(CCFLAGS = ['-g', '-Wall'])
 env.Append(LIBS = ['SDL_image'])
 # add fifo header and lib
 env.AppendUnique(CPPPATH=['lib', node_dir])
+# add static simulation flag as there is no other
+# hardware-implementation at the moment
+env.AppendUnique(CPPDEFINES=['_SIM_'])
 
 # build target
 # output executable will be "game"
