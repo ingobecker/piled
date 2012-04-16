@@ -12,8 +12,8 @@
 // but the animation begins after an offset
 // calculated by the address of this node
 
-uint8_t counter_offset = 0;
-uint8_t counter = 0;
+uint8_t counter_offset;
+uint8_t counter;
 
 void sim_node_setup(){
   sim_node_define_context(2, &counter, &counter_offset);
@@ -22,16 +22,15 @@ void sim_node_setup(){
 void shift_pixel(node_t *node){
 
   if(node->animation_reg & (1<<ANIFF)){
-    counter_offset = 0;
+    //counter_offset = 0;
     counter = 0;
   }
 
   if(counter_offset > node->address){
     uint8_t v;
     v = 0xff - ((counter & 15) * 17);
-    printf("v=%d\n", v);
+    printf("offset=%d, v=%d\n", counter_offset, v);
     fifo_put(&node->brightness_buffer, v);
-    puts("down");
 
     counter++;
 

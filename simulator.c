@@ -11,6 +11,7 @@
 #include "pixel.h"
 #include "animation.h"
 #include "graphics.h"
+#include "misc.h"
 
 
 /*
@@ -88,46 +89,17 @@ void main_task(SDL_Surface *screen){
     animation_render_pixel_frame(&sim_node->node, pixel);
 
     // sensor
+    sim_fifo_buffer_monkeypatch(1);
+    sensor_scan(pixel, sim_node);
+    sim_fifo_buffer_monkeypatch(0);
 
     sim_node_save_context(sim_node->node_context);
     pixels = pixels->next;
     sim_nodes = sim_nodes->next;
   }
 
-  /*
-  // data rx
-  linked_list_t *p = pixels_g;
-  while(p){
-    struct sim_pixel *pixel = p->val;
-    if(pixel->node.data_rx_buffer.fill_size > 0)
-      data_rx_handler(&pixel->node);
-    p = p->next;
-  }
-
-  // data tx
-  if(pixel != NULL){
-    if(pixel->node.data_tx_buffer.fill_size > 0){
-      puts("found data to transmit");
-      uint8_t data = fifo_get(&pixel->node.data_tx_buffer);
-      linked_list_t *p = pixels;
-      while(p){
-        struct sim_pixel *pixel_walk = p->val;
-        fifo_put(&pixel_walk->node.data_rx_buffer, data);
-        p = p->next;
-      }
-    }
-  }
-  */
-
-/*
-  linked_list_t *p = pixels;
-  while(p){
-    struct sim_pixel *pixel = p->val;
-    if(pixel->node.data_rx_buffer.fill_size == pixel->node.data_length)
-      data_rx(&pixel->node.rx_buffer);
-    p = p->next;
-  }
-  */
+  // handle data transfer
+  data_rx_process();
 }
 
 
