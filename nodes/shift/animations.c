@@ -19,6 +19,17 @@ void sim_node_setup(){
   sim_node_define_context(2, &counter, &counter_offset);
 }
 
+void node_setup(node_t *node){
+  // node setup
+  node->animation_reg = (1<<ANIFF);
+  node->animation_next = 0;
+  node->data_length = 1;
+
+  // node context setup
+  counter = 0;
+  counter_offset = 0;
+}
+
 void shift_pixel(node_t *node){
 
   if(node->animation_reg & (1<<ANIFF)){

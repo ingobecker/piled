@@ -37,11 +37,16 @@ extern void node_data_tx(uint8_t data);
   The following functions have to be
   implemented on an application specific manner.
 
+  node_setup():           This function is called once the program starts.
+                          Use this function to setup an initial state
+                          of the node.
   node_data_rx_handler(): This function is called every time
-                          the node receives an incomming data-frame.  node_sensor_handler():  This function is called every time
+                          the node receives an incomming data-frame.
+  node_sensor_handler():  This function is called every time
                           the nodes sensor was triggered.
 */
 
+extern void node_setup(node_t *node);
 extern void node_data_rx_handler(node_t *node);
 extern void node_sensor_handler(node_t *node, uint8_t data);
 #endif

@@ -121,14 +121,17 @@ linked_list_t *sim_nodes_alloc(int count){
 
     // address
     sim_node->node.address = count;
+    sim_node->node.address_max = PIXEL_COUNT;
 
     // animation register
-    sim_node->node.animation_reg = (1<<ANIFF);
-    sim_node->node.animation_next = 0;
-    sim_node->node.data_length = 1;
 
     // sim node context...
     sim_node->node_context = sim_node_alloc_context();
+
+    // run node setup
+    sim_node_load_context(sim_node->node_context);
+    node_setup(&sim_node->node);
+    sim_node_save_context(sim_node->node_context);
 
     if(sim_nodes == NULL)
       sim_nodes = linked_list_create(sim_node);
