@@ -14,6 +14,9 @@ void animation_render_pixel_frame(node_t *node, pixel_t *pixel){
   if(!(node->animation_reg & (1<<ANIEOF))){
     printf("render node id=%d\n", node->address);
     animation_index[node->animation_next](node);
+    if(node->animation_reg & (1<<ANIFF)){
+      pixel->blank = 1;
+    }
     node->animation_reg &= ~(1<<ANIFF);
   }
 }
@@ -41,6 +44,11 @@ void animation_draw_pixel_frame(SDL_Surface *screen, node_t *node, pixel_t *pixe
     int color = fifo_get(&node->brightness_buffer);
     SDL_FillRect(screen, &pixel->rect, SDL_MapRGB(screen->format, color, color, color));
   }
+  else
+    if(pixel->blank){
+      SDL_FillRect(screen, &pixel->rect, SDL_MapRGB(screen->format, 0, 0, 0));
+      pixel->blank = 0;
+    }
 }
 
 /*

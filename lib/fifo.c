@@ -6,7 +6,9 @@ struct fifo sim_tx_buffer_g = {
   .w_index = 0,
   .fill_size = 0,
 };
+
 int sim_tx_buffer_on = 0;
+
 void sim_fifo_buffer_monkeypatch(int on){
   sim_tx_buffer_on = on;
 }

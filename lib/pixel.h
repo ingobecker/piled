@@ -3,6 +3,7 @@
 
 struct pixel{
   SDL_Rect rect;
+  int blank;
 };
 
 typedef struct pixel pixel_t;
