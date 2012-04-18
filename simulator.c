@@ -11,6 +11,7 @@
 #include "pixel.h"
 #include "animation.h"
 #include "graphics.h"
+#include "transport.h"
 #include "misc.h"
 
 
@@ -55,10 +56,18 @@ Communication Layer
 
 
 uint16_t frame_cnt;
+linked_list_t *transport_buttons_g = NULL;
+int transport_state_g = STOP;
 
 void init_task(SDL_Surface *screen){
 
+  // background
   graphics_draw_background(screen);
+
+  // transport bar
+  transport_bar_draw(screen);
+  transport_buttons_g = transport_buttons_alloc();
+
 
   sim_node_setup();
   // alloc
@@ -100,6 +109,7 @@ void main_task(SDL_Surface *screen){
 
   // handle data transfer
   data_rx_process();
+
 }
 
 
@@ -125,7 +135,31 @@ int main(int argc, char *argv[])
       }
     }
 
-    main_task(screen);
+    // handle transport
+    int new_state = transport_buttons_scan(transport_buttons_g);
+    if(new_state >= 0){
+      printf("trying to change state to %d\n", new_state);
+      transport_state_transission(&transport_state_g, new_state);
+      printf("new state is: %d\n", transport_state_g);
+    }
+
+    switch(transport_state_g){
+      case PLAY:
+        main_task(screen);
+        break;
+
+      case PAUSE:
+        break;
+
+      case STOP:
+        break;
+
+      case FRAME_FORWARD:
+        transport_state_transission(&transport_state_g, transport_state_g);
+        main_task(screen);
+        break;
+    }
+
     frame_cnt++;
     if(frame_cnt == STOP_FRAME)
       done = 1;
