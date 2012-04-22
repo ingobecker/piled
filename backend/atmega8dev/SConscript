@@ -1,0 +1,25 @@
+import os.path
+
+Import('env', 'sources', 'node')
+
+fcpu = 16000000
+mmcu = 'atmega8'
+
+env['CC'] = 'avr-gcc'
+env.AppendUnique(CPPPATH=['.'])
+
+bld = Builder(action = 'avr-objcopy -j .text -j .data -O ihex $SOURCE $TARGET',
+        suffix = '.hex',
+        src_suffix = '.elf')
+
+env.Append(BUILDERS = {'Hex' : bld})
+
+backend_sources =  env.Glob('*.c')
+backend_objects = []
+
+for src in backend_sources:
+  target = os.path.join('backend', src.name.split('.')[0] + '.o')
+  o = env.Object(target = target, source = src)
+  backend_objects.append(o)
+
+env.Program(target = node, source = backend_objects + sources['lib'] + sources['node'])

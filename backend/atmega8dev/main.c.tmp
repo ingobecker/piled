@@ -1,0 +1,52 @@
+#include <avr/io.h>
+#include <avr/interrupt.h>
+#include "fifo.h"
+
+/*
+
+  OCR1A = 100 Hz
+  OCR1B = brightness
+
+*/
+
+#define FLED            (100 * 0xff)
+
+#define TIMER_CS        64
+#define TIMER_CLK       (FCPU / TIMER_CS)
+#define TIMER_OCR_FACT  (uint_16t)(TIMER_CLK / FLED)
+
+#define LED_DDR         DDRB
+#define LED_PORT        PORTB
+#define LED_BIT         0
+
+volatile uint8t brightness = 20;
+
+void main(){
+
+  LED_DDR |= _BV(LED_BIT);
+
+  // WGM = CTC
+  TCCR1B |= _BV(WGM12);
+  // CS = 64
+  TCCR1B |= _BV(CS10) | _BC(CS11);
+  // set OC1A pin to low on match
+  TCCRA |= _BV(COM1A1);
+
+  sei(); 
+  while(1){
+  }
+
+}
+
+ISR(TIMER1_COMPA_vect){
+  // recalculate refresh rates
+  uint8_t comp_led_off = brightness;
+  uint8_t comp_refresh = 0xff - brightness;
+
+  OCR1A = comp_refresh * TIMER_OCR_FACT;
+  OCR1B = comp_led_off * TIMER_OCR_FACT;
+}
+
+ISR(TIMER1_COMPB_vect){
+  LED_PORT &= ~ _BV(LED_BIT);
+}
