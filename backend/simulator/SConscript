@@ -1,0 +1,23 @@
+import os.path
+
+Import('env', 'sources', 'node')
+
+# add static simulation flag as there is no other
+# hardware-implementation at the moment
+env.AppendUnique(CPPDEFINES=['_SIM_'])
+
+# determine compiler and linker flags for SDL
+env.ParseConfig('sdl-config --cflags')
+env.ParseConfig('sdl-config --libs')
+env.Append(LIBS = ['SDL_image'])
+env.AppendUnique(CPPPATH=['.'])
+
+backend_sources =  env.Glob('*.c')
+backend_objects = []
+
+for src in backend_sources:
+  target = os.path.join('backend', src.name.split('.')[0] + '.o')
+  o = env.Object(target = target, source = src)
+  backend_objects.append(o)
+
+env.Program(target = node, source = backend_objects + sources['lib'] + sources['node'])
