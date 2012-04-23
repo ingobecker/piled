@@ -1,4 +1,5 @@
 import os.path
+from py.scons.utils import *
 
 Import('env', 'sources', 'node')
 
@@ -15,9 +16,9 @@ env.AppendUnique(CPPPATH=['.'])
 backend_sources =  env.Glob('*.c')
 backend_objects = []
 
-for src in backend_sources:
-  target = os.path.join('backend', src.name.split('.')[0] + '.o')
-  o = env.Object(target = target, source = src)
-  backend_objects.append(o)
+objs_lib = targets_from_src_list(sources['lib'], 'lib', env.Object)
+node_dir = os.path.join('nodes', node)
+objs_node = targets_from_src_list(sources['node'], node_dir, env.Object)
+objs_backend = targets_from_src_list(backend_sources, 'backend', env.Object)
 
-env.Program(target = node, source = backend_objects + sources['lib'] + sources['node'])
+env.Program(target = node, source = objs_backend + objs_lib + objs_node)

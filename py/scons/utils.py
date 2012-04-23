@@ -1,3 +1,5 @@
+import os.path
+
 # Helper methods
 def create_opts_str(opts_array, prefix='-'):
   str = ''
@@ -13,6 +15,14 @@ def create_ext_opts_str(opts_dict):
 
 def change_suffix(obj, suffix):
   return str(obj).split('.', 1)[0] + ".{0}".format(suffix)
+
+def targets_from_src_list(src_list, target_path, builder):
+  objects = []
+  for src in src_list:
+    target = os.path.join(target_path, change_suffix(src.name, 'o'))
+    objects.append(builder(target = target, source = src))
+  return objects
+
 
 def PhonyTargets(env = None, **kw):
   if not env: env = DefaultEnvironment()

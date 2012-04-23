@@ -18,7 +18,5 @@ extern void animation_render_pixel_frame(node_t *node, pixel_t *pixel);
 
 extern void animation_render_frame(linked_list_t *pixels);
 extern void animation_output_frame(SDL_Surface *screen, linked_list_t *pixels);
-typedef void(*animation_t)(node_t *node);
-extern animation_t animation_index[];
 
 #endif

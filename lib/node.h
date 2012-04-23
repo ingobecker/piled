@@ -49,4 +49,7 @@ extern void node_data_tx(uint8_t data);
 extern void node_setup(node_t *node);
 extern void node_data_rx_handler(node_t *node);
 extern void node_sensor_handler(node_t *node, uint8_t data);
+
+typedef void(*animation_t)(node_t *node);
+extern animation_t animation_index[];
 #endif

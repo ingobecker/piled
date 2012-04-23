@@ -1,6 +1,4 @@
-#include <stdint.h>
-#include <stdio.h>
-#include "linked_list.h"
+#include "types.h"
 #include "fifo.h"
 #include "node.h"
 

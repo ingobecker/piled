@@ -9,6 +9,11 @@ bin_dir = 'bin'
 
 # node-code selection
 node = BUILD_TARGETS[0].split(os.sep)[-1]
+node_parts = node.split('.')
+if len(node_parts) >= 2:
+  node = node_parts[-2]
+
+print "Building node '{0}'".format(node)
 
 node_dir = os.path.join('nodes', node)
 sources['node'] = Glob(os.path.join(node_dir, '*.c'))
@@ -26,7 +31,6 @@ for backend_dir in backend_dirs:
   env.Default(None)
   env.Append(CCFLAGS = ['-g', '-Wall'])
   env.AppendUnique(CPPPATH=['#lib'])#, '#' + node_dir])
-  print env['CPPPATH']
 
   env.Export(env = env, sources = sources, node = node)
   backend_path = os.path.join(backend_root_dir, backend_dir)

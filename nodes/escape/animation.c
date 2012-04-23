@@ -1,12 +1,6 @@
-#include <stdint.h>
-#include <stdio.h>
-#include <SDL/SDL.h>
-#include "config.h"
-#include "linked_list.h"
+#include "types.h"
 #include "fifo.h"
 #include "node.h"
-#include "pixel.h"
-#include "animation.h"
 
 // this animation dims up the led
 // but the animation begins after an offset
