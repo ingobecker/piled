@@ -18,6 +18,6 @@ void node_data_rx_handler(node_t *node){
 void node_sensor_handler(node_t *node, uint8_t data){
   node->animation_next = 0;
   node->animation_reg = (1<<ANIFF);
-  puts("sensi senso");
+  //puts("sensi senso");
   fifo_put(&node->data_tx_buffer, node->address);
 }

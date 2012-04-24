@@ -34,7 +34,7 @@ void shift_pixel(node_t *node){
   if(counter_offset > node->address){
     uint8_t v;
     v = 0xff - ((counter & 15) * 17);
-    printf("offset=%d, v=%d\n", counter_offset, v);
+    //printf("offset=%d, v=%d\n", counter_offset, v);
     fifo_put(&node->brightness_buffer, v);
 
     counter++;
