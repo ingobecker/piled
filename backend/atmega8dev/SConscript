@@ -3,9 +3,13 @@ from py.scons.utils import *
 
 Import('env', 'sources', 'node')
 
+programmer = 'usbasp'
+avrdude = 'avrdude'
+device = 'atmega8'
+
 cflags = {
   'DF_CPU': 16000000,
-  'mmcu': 'atmega8'
+  'mmcu': device
   }
 
 env['CC'] = 'avr-gcc'
@@ -26,4 +30,18 @@ objs_node = targets_from_src_list(sources['node'], 'nodes', env.Object)
 objs_backend = targets_from_src_list(backend_sources, 'backend', env.Object)
 
 node_elf = env.Program(target = node + '.elf', source = objs_backend + objs_lib + objs_node)
-env.Hex(target = node + '.hex', source = node_elf)
+tg = env.Hex(target = node + '.hex', source = node_elf)
+
+# flash commands
+
+AddOption('--flash', action='store_true', dest='flash')
+
+if GetOption('flash'):
+  target = COMMAND_LINE_TARGETS[0]
+
+  if target.endswith('.hex'):
+    print "target: " + target
+    print "flash"*23
+    cmd = "{0} -c {1} -p {2} -U flash:w:{3}:i".format(avrdude, programmer, device, target)
+    env.AddPostAction(tg, cmd)
+    env.AlwaysBuild(target)
