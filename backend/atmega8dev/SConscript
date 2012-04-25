@@ -3,7 +3,7 @@ from py.scons.utils import *
 
 Import('env', 'sources', 'node')
 
-programmer = 'usbasp'
+programmer = 'avrispv2'
 avrdude = 'avrdude'
 device = 'atmega8'
 
@@ -15,6 +15,7 @@ cflags = {
 env['CC'] = 'avr-gcc'
 env.AppendUnique(CPPPATH=['.'])
 env.Append(CFLAGS=create_ext_opts_str(cflags))
+env.Append(LINKFLAGS=create_ext_opts_str(cflags))
 
 bld = Builder(action = 'avr-objcopy -j .text -j .data -O ihex $SOURCE $TARGET',
         suffix = '.hex',
@@ -29,7 +30,7 @@ objs_lib = targets_from_src_list(sources['lib'], 'lib', env.Object)
 objs_node = targets_from_src_list(sources['node'], 'nodes', env.Object)
 objs_backend = targets_from_src_list(backend_sources, 'backend', env.Object)
 
-node_elf = env.Program(target = node + '.elf', source = objs_backend + objs_lib + objs_node)
+node_elf = env.Program(target = node + '.elf', source = objs_backend)#+ objs_lib + objs_node)
 tg = env.Hex(target = node + '.hex', source = node_elf)
 
 # flash commands
@@ -42,6 +43,6 @@ if GetOption('flash'):
   if target.endswith('.hex'):
     print "target: " + target
     print "flash"*23
-    cmd = "{0} -c {1} -p {2} -U flash:w:{3}:i".format(avrdude, programmer, device, target)
+    cmd = "{0} -P usb -c {1} -p {2} -U flash:w:{3}:i".format(avrdude, programmer, device, target)
     env.AddPostAction(tg, cmd)
     env.AlwaysBuild(target)
