@@ -4,54 +4,82 @@
 #include "node.h"
 
 /*
+  sfreg - internal used virtual status-flag register
 
-  OCR1A = 100 Hz
-  OCR1B = brightness
+  This register is used to signal event-states from
+  within event handler to other handler-routines.
+
+  It has the following flags that could be raised:
+
+  BEGIN_CYCLE_FLAG  we are at the beginning
+                    of a refresh-period
+
+  SENSOR_FLAG       the sensor handler needs
+                    to be called
+
+  OUTPUT_FLAG       an frame from the fifo needs
+                    to be prepared for output
 
 */
 
-#define FLED            (100 * 0xff)
+#define BEGIN_CYCLE_FLAG   0
+#define SENSOR_FLAG        1
+#define OUTPUT_FLAG        2
 
-#define TIMER_CS        64
-#define TIMER_CLK       (F_CPU / TIMER_CS)
-#define TIMER_OCR_FACT  (uint16_t)(TIMER_CLK / FLED)
-
-#define LED_DDR         DDRB
-#define LED_PORT        PORTB
-#define LED_BIT         1
-
-volatile uint8_t brightness = 40;
+volatile uint8_t sfreg;
 
 void main(){
 
-  DDRB = _BV(1);
-  // WGM = CTC, CS = 64
-  TCCR1B = (_BV(WGM12) | _BV(CS10) | _BV(CS11));
-
-  // enable irq on output compare match
-  TIMSK = _BV(OCIE1A);// | _BV(OCIE1B));
-  
-  OCR1A = 2550;
-  TCNT1 = 0;
-  //OCR1B = brightness * 10;
-
-  //PORTB = _BV(1);
-  sei();
-  while(1){
-    ;
+  // do following things once per refresh-period
+  if(sfreg & _BV(BEGIN_CYCLE)){
+    sfreg |= _BV(SENSOR) | _BV(OUTPUT);
+    sfreg &= ~_BV(BEGIN_CYCLE);
   }
 
-}
+  // prepare output frame
+  if(sfreg & OUTPUT_FLAG){
 
-ISR(TIMER1_COMPA_vect){
-  // recalculate refresh rates
-  //LED_PORT &= ~_BV(LED_BIT);
-  //LED_PORT =~ LED_PORT;
-  PORTB = 2;
-}
+    if(node->brightness_buffer.fill_size > 1){
+      // get one from fifo and calulate ocr values
+      uint8_t brightness = fifo_get(&node->brightness_buffer);
+      output_ocr_off = brightness * FLED; 
+      output_ocr_on = (0xff - brightness) * FLED;
 
-/*
-ISR(TIMER1_COMPB_vect){
-  //LED_PORT |= _BV(LED_BIT);
+      // lookup the next value for corretct ocr-mode
+      uint8_t brightness_lookup = fifo_lookup(&node->brightness_buffer);
+      if(brightness_lookup)
+        output_oc_mode_on = COM_HIGH;
+      else
+        output_oc_mode_on = COM_LOW;
+
+      sfreg &= ~_BV(OUTPUT_FLAG);
+    }
+    else{
+      if(node->brightness_buffer.fill_size == 1){
+        if(node->animation_reg & _BV(ANIEOF)){
+          uint8_t brightness = fifo_get(&node->brightness_buffer);
+          output_ocr_off = brightness * FLED; 
+          output_ocr_on = (0xff - brightness) * FLED;
+          // we have the last frame here
+          // so lets turn the led of after it...
+          output_oc_mode_on = COM_LOW;
+          // no lookup needed here..
+          sfreg &= ~_BV(OUTPUT_FLAG);
+        }
+      }
+    }
+  }
+
+  // handle sensor
+  if(sfreg & SENSOR_FLAG){
+    sfreg &= ~_BV(SENSOR_FLAG);
+  }
+
+  // render frame
+  if(!(node->animation_reg & _BV(ANIEOF))){
+    animation_index[animation_next]();
+  }
+  // handle data tx
+  // handle data rx
+
 }
-*/
