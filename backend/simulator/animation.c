@@ -13,7 +13,7 @@ extern int frame_cnt;
 void animation_render_pixel_frame(node_t *node, pixel_t *pixel){
   if(!(node->animation_reg & (1<<ANIEOF))){
     printf("render node id=%d\n", node->address);
-    animation_index[node->animation_next](node);
+    node_loop(node);
     if(node->animation_reg & (1<<ANIFF)){
       pixel->blank = 1;
     }
