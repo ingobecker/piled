@@ -16,7 +16,6 @@ extern linked_list_t *sim_nodes_alloc(int count); // and init...
 // node context holds node instance specific
 // context variables
 extern linked_list_t *sim_node_context_vars_g;
-extern void sim_node_define_context(int cnt, ...);
 extern void sim_node_load_context(linked_list_t *ctx_vals);
 extern void sim_node_save_context(linked_list_t *ctx_vals);
 extern void sim_node_free_context(linked_list_t *ctx_vals);

@@ -2,6 +2,7 @@
 
 #include <stdint.h>
 #include <stdio.h>
+#define _BV(bit)    (1<<bit)
 
 #else
 #include <avr/io.h>

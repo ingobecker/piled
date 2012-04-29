@@ -3,7 +3,7 @@
 /*
   glue for simulator
 
-  just a quick hack to make the nodes compile for hardware-backends without
+  HACK: Just a quick hack to make the nodes compile for hardware-backends without
   modifications in node-code.
 
   TODO: check if this leads to "nop" due to optimization, if not
