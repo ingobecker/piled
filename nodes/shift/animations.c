@@ -24,7 +24,7 @@ void node_setup(node_t *node){
   counter_offset = 0;
 }
 
-void shift_pixel(node_t *node){
+void node_loop(node_t *node){
 
   if(node->animation_reg & (1<<ANIFF)){
     //counter_offset = 0;
@@ -98,7 +98,3 @@ void shift_fade_pixel(node_t *node){
 #endif
 }
 */
-
-animation_t animation_index[] = { 
- shift_pixel 
-};

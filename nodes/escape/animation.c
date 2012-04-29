@@ -26,7 +26,7 @@ void node_setup(node_t *node){
   node->data_length = 1;
 }
 
-void escape(node_t *node){
+void node_loop(node_t *node){
 
   if(node->animation_reg & (1<<ANIFF))
     counter = 0;
@@ -51,7 +51,3 @@ void escape(node_t *node){
   else
     counter_offset--;
 }
-
-animation_t animation_index[] = { 
-  escape
-};
